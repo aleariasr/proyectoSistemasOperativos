@@ -1,17 +1,19 @@
 import socket
 import threading
+from screenshot_servidor import capturar_pantalla_png_bytes #para las funciones de captura pantalla
 from funciones_servidor import obtener_informacion_sistema
 from control_sistema import (
     subir_volumen, bajar_volumen, silenciar,
     apagar, reiniciar, cerrar_sesion, mostrar_mensaje
 )
+from typing import Union
 
 HOST = ''          # 0.0.0.0 en todas las interfaces
 PORT = 5050
 RECV_SIZE = 4096   # mayor por si vienen líneas largas
 IDLE_TIMEOUT = 120 # segs por conexión
 
-def _procesar_comando(cmd: str) -> str:
+def _procesar_comando(cmd: str) -> Union[str, bytes]:
     comando = cmd.strip()
     comando_upper = comando.upper()
 
@@ -37,8 +39,14 @@ def _procesar_comando(cmd: str) -> str:
     if comando_upper.startswith("MENSAJE "):
         texto = comando[len("MENSAJE "):]
         return mostrar_mensaje(texto)
+    if comando_upper == "SCREENSHOT":
+        try:
+            return capturar_pantalla_png_bytes()  #  bytes PNG
+        except Exception as e:
+            return f"Error al capturar pantalla: {e}"
 
     return f"Comando no reconocido: {comando}"
+
 
 def manejar_cliente(conn: socket.socket, addr):
     print(f"[NUEVA CONEXIÓN] {addr} conectado.")
@@ -52,16 +60,28 @@ def manejar_cliente(conn: socket.socket, addr):
                 break
             buffer += chunk.decode('utf-8', errors='replace')
 
-            # Procesa por líneas
+            # Procesa por líneas completas
             while '\n' in buffer:
                 linea, buffer = buffer.split('\n', 1)
                 respuesta = _procesar_comando(linea)
+
                 if respuesta == "":
                     continue
                 if respuesta == "__CLOSE__":
                     conn.sendall("Conexión cerrada por el cliente.\n".encode('utf-8'))
                     return
-                conn.sendall((respuesta + "\n").encode('utf-8'))
+
+                # detectar si la respuesta es bytes para la captura de pantalla (imagen PNG) ---
+                if isinstance(respuesta, (bytes, bytearray)):
+                    n = len(respuesta)
+                    # Enviar encabezado con tamaño de imagen
+                    conn.sendall(f"IMG {n}\n".encode("utf-8"))
+                    # Enviar los bytes del PNG
+                    conn.sendall(respuesta)
+                else:
+                    # Respuesta de texto normal
+                    conn.sendall((respuesta + "\n").encode('utf-8'))
+                # ---------------------------------------------------------------
 
     except socket.timeout:
         conn.sendall("Timeout de inactividad.\n".encode('utf-8'))
@@ -74,6 +94,7 @@ def manejar_cliente(conn: socket.socket, addr):
     finally:
         conn.close()
         print(f"[DESCONECTADO] {addr}")
+
 
 def iniciar_servidor():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
