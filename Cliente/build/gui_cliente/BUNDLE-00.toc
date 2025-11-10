@@ -1,0 +1,4 @@
+([('gui_cliente',
+   '/Users/alejandroarias/Visual Studio '
+   'Code/ProyectoSistemasOperativos/Cliente/dist/gui_cliente',
+   'EXECUTABLE')],)
