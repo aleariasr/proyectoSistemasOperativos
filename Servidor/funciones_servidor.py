@@ -28,6 +28,7 @@ def obtener_informacion_sistema():
         "usuario_actual": usuario,
         "zona_horaria": datetime.now().astimezone().tzname(),
         "fecha_hora": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "resolucion_pantalla": _resolucion_pantalla(),
     }
 
     # RAM total
@@ -66,3 +67,20 @@ def obtener_informacion_sistema():
     info["procesos"] = procesos[:10]
 
     return json.dumps(info, ensure_ascii=False)
+
+def _resolucion_pantalla():
+    """
+    Devuelve "ANCHOxALTO" usando mss (seguro en hilos y multiplataforma).
+    Si falla, devuelve "N/D".
+    """
+    try:
+        import mss
+        with mss.mss() as sct:
+            mon = sct.monitors[1]  # pantalla principal
+            w = mon.get("width")
+            h = mon.get("height")
+            if w and h:
+                return f"{w}x{h}"
+    except Exception as e:
+        print(f"[ADVERTENCIA] No se pudo obtener resolución: {e}")
+    return "N/D"
