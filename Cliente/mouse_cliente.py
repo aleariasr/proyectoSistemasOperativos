@@ -1,28 +1,31 @@
 # Cliente/mouse_cliente.py
 import time
+from threading import Event
 from pynput import mouse
 
-def controlar_mouse_remoto(cliente):
+def controlar_mouse_remoto(cliente, stop_event: Event, fps: int = 30):
     """
-    Envía los movimientos y clics del mouse al servidor con límite de frecuencia.
-    Ctrl+C para detener.
+    Envía movimientos y clics del mouse al servidor con límite de frecuencia (fps).
+    Se detiene cuando stop_event.is_set() == True.
     """
-    print("🖱️ Control remoto activado. Mueve el mouse o haz clic. Ctrl+C para salir.")
-
-    ultimo_envio = 0
-    intervalo = 0.03  # segundos entre envíos (≈33 ms → 30 fps)
+    intervalo = 1.0 / max(1, fps)
+    ultimo_envio = 0.0
 
     def on_move(x, y):
         nonlocal ultimo_envio
+        if stop_event.is_set():
+            return False
         ahora = time.time()
-        if ahora - ultimo_envio >= intervalo:
+        if (ahora - ultimo_envio) >= intervalo:
             try:
                 cliente.sendall(f"MOUSE_MOVE {int(x)} {int(y)}\n".encode("utf-8"))
                 ultimo_envio = ahora
             except Exception:
-                return False  # detiene listener
+                return False
 
     def on_click(x, y, button, pressed):
+        if stop_event.is_set():
+            return False
         if pressed:
             try:
                 btn = str(button).split(".")[-1]
@@ -33,8 +36,13 @@ def controlar_mouse_remoto(cliente):
             except Exception:
                 return False
 
-    with mouse.Listener(on_move=on_move, on_click=on_click) as listener:
+    listener = mouse.Listener(on_move=on_move, on_click=on_click)
+    listener.start()
+    try:
+        while listener.is_alive() and not stop_event.is_set():
+            time.sleep(0.05)
+    finally:
         try:
-            listener.join()
-        except KeyboardInterrupt:
-            print("🛑 Control remoto detenido.")
+            listener.stop()
+        except Exception:
+            pass
