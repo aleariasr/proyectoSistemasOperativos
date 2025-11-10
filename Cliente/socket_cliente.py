@@ -1,5 +1,6 @@
 import socket
 import json
+from mouse_cliente import controlar_mouse_remoto
 
 RECV_SIZE = 4096
 
@@ -74,6 +75,8 @@ def enviar_comandos(cliente):
 
             if mensaje.lower() == "salir":
                 break
+            elif mensaje.upper() == "CONTROL_MOUSE":
+                controlar_mouse_remoto(cliente)
 
     except KeyboardInterrupt:
         print("\n[INTERRUPCIÓN] Cerrando conexión...")

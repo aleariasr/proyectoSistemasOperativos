@@ -6,6 +6,7 @@ from control_sistema import (
     subir_volumen, bajar_volumen, silenciar,
     apagar, reiniciar, cerrar_sesion, mostrar_mensaje
 )
+from control_mouse import mover_cursor, click_izquierdo, click_derecho, doble_click
 from typing import Union
 
 HOST = ''          # 0.0.0.0 en todas las interfaces
@@ -44,7 +45,24 @@ def _procesar_comando(cmd: str) -> Union[str, bytes]:
             return capturar_pantalla_png_bytes()  #  bytes PNG
         except Exception as e:
             return f"Error al capturar pantalla: {e}"
+        
+    if comando_upper.startswith("MOUSE_MOVE"):
+        # formato: MOUSE_MOVE x y
+        try:
+            _, x_str, y_str = comando.split()
+            x, y = int(x_str), int(y_str)
+            return mover_cursor(x, y)
+        except Exception:
+            return "Uso: MOUSE_MOVE <x> <y>"
 
+    if comando_upper == "MOUSE_CLICK_IZQ":
+        return click_izquierdo()
+
+    if comando_upper == "MOUSE_CLICK_DER":
+        return click_derecho()
+
+    if comando_upper == "MOUSE_DBLCLICK":
+        return doble_click()
     return f"Comando no reconocido: {comando}"
 
 
