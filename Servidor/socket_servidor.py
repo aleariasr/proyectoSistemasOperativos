@@ -63,6 +63,10 @@ def _procesar_comando(cmd: str) -> Union[str, bytes]:
 
     if comando_upper == "MOUSE_DBLCLICK":
         return doble_click()
+    
+    if comando_upper == "CONTROL_MOUSE":
+        return "Modo de control de ratón activado (cliente enviará eventos)."
+    
     return f"Comando no reconocido: {comando}"
 
 
