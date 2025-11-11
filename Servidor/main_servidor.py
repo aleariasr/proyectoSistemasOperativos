@@ -1,10 +1,6 @@
-from socket_servidor import iniciar_servidor
+from gui_servidor import ServidorGUI
 
 if __name__ == "__main__":
-    print("=== Servidor TCP - Sistemas Operativos ===")
-    try:
-        iniciar_servidor()
-    except KeyboardInterrupt:
-        print("\n[DETENIDO] Servidor finalizado manualmente.")
-    except Exception as e:
-        print(f"[ERROR CRÍTICO] {e}")
+    print("=== Servidor TCP con GUI - Sistemas Operativos ===")
+    app = ServidorGUI()
+    app.mainloop()
