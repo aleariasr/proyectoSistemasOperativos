@@ -1,8 +1,8 @@
-from socket_cliente import conectar_servidor, enviar_comandos
+from gui_cliente import App
 
 if __name__ == "__main__":
-    print("=== Cliente TCP (persistente) - Sistemas Operativos ===")
-    ip = input("Ingrese la IP del servidor: ").strip()
-    cliente = conectar_servidor(ip)
-    if cliente:
-        enviar_comandos(cliente)
+    print("=== Cliente TCP con GUI - Sistemas Operativos ===")
+    app = App()
+    app.mainloop()
+
+

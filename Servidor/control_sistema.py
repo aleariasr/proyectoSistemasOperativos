@@ -20,25 +20,20 @@ def _applescript(cmd: str) -> int:
 def subir_volumen():
     try:
         if _is_windows():
-            from ctypes import cast, POINTER
-            from comtypes import CLSCTX_ALL
-            from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-
-            dispositivos = AudioUtilities.GetSpeakers()
-            interfaz = dispositivos.Activate(
-                IAudioEndpointVolume._iid_, CLSCTX_ALL, None
-            )
-            volumen = cast(interfaz, POINTER(IAudioEndpointVolume))
-            volumen.VolumeStepUp(None)
+            # Usar pyautogui - más simple y confiable
+            import pyautogui
+            # Simular presionar tecla de subir volumen 3 veces
+            for _ in range(3):
+                pyautogui.press('volumeup')
+            return "Volumen aumentado"
         elif _is_macos():
-            # Limitar a 100
             _applescript("set v to output volume of (get volume settings)")
             _applescript("set nv to (v + 10)")
             _applescript("if nv > 100 then set nv to 100")
             _applescript("set volume output volume nv")
+            return "Volumen aumentado"
         else:
             return "Volumen: acción no implementada en este SO"
-        return "Volumen aumentado"
     except Exception as e:
         return f"Error al subir volumen: {e}"
 
@@ -46,24 +41,20 @@ def subir_volumen():
 def bajar_volumen():
     try:
         if _is_windows():
-            from ctypes import cast, POINTER
-            from comtypes import CLSCTX_ALL
-            from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-
-            dispositivos = AudioUtilities.GetSpeakers()
-            interfaz = dispositivos.Activate(
-                IAudioEndpointVolume._iid_, CLSCTX_ALL, None
-            )
-            volumen = cast(interfaz, POINTER(IAudioEndpointVolume))
-            volumen.VolumeStepDown(None)
+            # Usar pyautogui - más simple y confiable
+            import pyautogui
+            # Simular presionar tecla de bajar volumen 3 veces
+            for _ in range(3):
+                pyautogui.press('volumedown')
+            return "Volumen reducido"
         elif _is_macos():
             _applescript("set v to output volume of (get volume settings)")
             _applescript("set nv to (v - 10)")
             _applescript("if nv < 0 then set nv to 0")
             _applescript("set volume output volume nv")
+            return "Volumen reducido"
         else:
             return "Volumen: acción no implementada en este SO"
-        return "Volumen reducido"
     except Exception as e:
         return f"Error al bajar volumen: {e}"
 
@@ -71,21 +62,15 @@ def bajar_volumen():
 def silenciar():
     try:
         if _is_windows():
-            from ctypes import cast, POINTER
-            from comtypes import CLSCTX_ALL
-            from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-
-            dispositivos = AudioUtilities.GetSpeakers()
-            interfaz = dispositivos.Activate(
-                IAudioEndpointVolume._iid_, CLSCTX_ALL, None
-            )
-            volumen = cast(interfaz, POINTER(IAudioEndpointVolume))
-            volumen.SetMute(1, None)
+            # Usar pyautogui - más simple y confiable
+            import pyautogui
+            pyautogui.press('volumemute')
+            return "Sonido silenciado/activado"
         elif _is_macos():
             _applescript("set volume output muted true")
+            return "Sonido silenciado"
         else:
             return "Silencio: acción no implementada en este SO"
-        return "Sonido silenciado"
     except Exception as e:
         return f"Error al silenciar: {e}"
 

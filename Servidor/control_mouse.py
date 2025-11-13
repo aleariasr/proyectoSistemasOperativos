@@ -1,5 +1,8 @@
 import pyautogui
 
+# Desactivar el fail-safe para control remoto
+pyautogui.FAILSAFE = False
+
 def mover_cursor(x, y):
     """Mueve el cursor a las coordenadas dadas."""
     try:
@@ -11,20 +14,20 @@ def mover_cursor(x, y):
 def click_izquierdo():
     try:
         pyautogui.click(button='left')
+        return ""
     except Exception as e:
         return f"Error al hacer clic izquierdo: {e}"
-    return ""
 
 def click_derecho():
     try:
         pyautogui.click(button='right')
+        return ""
     except Exception as e:
         return f"Error al hacer clic derecho: {e}"
-    return ""
 
 def doble_click():
     try:
         pyautogui.doubleClick()
+        return ""
     except Exception as e:
         return f"Error al hacer doble clic: {e}"
-    return ""
