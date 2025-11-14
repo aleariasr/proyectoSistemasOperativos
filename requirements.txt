@@ -1,11 +1,8 @@
-# Requisitos del proyecto - Sistemas Operativos 2025
-psutil>=5.9.0
-pycaw>=20230407
-comtypes>=1.1.14
-mss>=9.0.1
-Pillow>=10.0.0
-pyautogui>=0.9.54
-customtkinter>=5.2.0
-pynput>=1.7.6
-#NOTA PARA JONAS Y ALE, PUEDEN DESCARGAR TODO LO DE ESTOS REQUERIMIENTOS FUNCIONALES DE UNA EN SUS VISUAL 
-#UTILIZANDO EL SIGUIENTE COMANDO: pip install -r requirements.txt
+psutil
+mss
+Pillow
+pynput
+pyautogui
+customtkinter
+pycaw ; sys_platform == "win32"
+comtypes ; sys_platform == "win32"
